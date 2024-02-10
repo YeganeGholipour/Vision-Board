@@ -1,3 +1,4 @@
+from unicodedata import category
 from django.db import models
 from user.models import User
 from .choices import SubBoardStatusChoices, SubBoardPriorityChoices, RoleChoices
@@ -7,10 +8,17 @@ from .choices import SubBoardStatusChoices, SubBoardPriorityChoices, RoleChoices
 
 # Goals
 # Tasks
+# Category
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 class Board(models.Model):
+    user = models.OneToOneField(User)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -18,7 +26,7 @@ class Board(models.Model):
 class SubBoard(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='sub_boards')
     title = models.CharField(max_length=255)
     inspiration = models.TextField()
     description = models.TextField()
@@ -35,6 +43,9 @@ class SubBoard(models.Model):
         default=SubBoardStatusChoices.PENDING,
     )
 
+    def __str__(self):
+        return self.title
+
 class SubBoardUser(models.Model):
     users = models.ManyToManyField(User, on_delete=models.CASCADE)
     sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE)
@@ -47,8 +58,9 @@ class Goal(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE)  
+    sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE, related_name='goals')  
     due_date = models.DateTimeField()
+    category = models.ManyToManyField(Category, related_name="goal_categories")
     priority = models.CharField(
         max_length=20, 
         choices=SubBoardPriorityChoices.choices, 
@@ -59,6 +71,9 @@ class Goal(models.Model):
         choices=SubBoardStatusChoices.choices,
         default=SubBoardStatusChoices.PENDING,
     )
+
+    def __str__(self):
+        return self.title 
 
 class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -78,3 +93,6 @@ class Task(models.Model):
         default=SubBoardStatusChoices.PENDING,
     )
     assigned_to = models.ManyToManyField(User)  
+
+    def __str__(self):
+        return self.title

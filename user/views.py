@@ -16,6 +16,8 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 
 from .models import User
+from board.models import Board
+
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserForgetPasswordRequestSerializer, UserPasswordResetConfirmSerializer, UserChangePasswordSerializer
 class RegisterView(APIView):
     serializer_class = UserRegisterSerializer
@@ -32,6 +34,9 @@ class RegisterView(APIView):
         )
         user.set_password(serializer.validated_data['password'])
         user.save()
+
+        board = Board.objects.create(user=user)
+        board.save()
 
         return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
 
