@@ -6,7 +6,7 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, UpdateMod
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from .permissions import IsAdmin, IsViewer, IsUser, HasUserAcessToSubBoard, IsAdminOrIsUser
-from .models import Board, SubBoard, SubBoardUser
+from .models import Board
 from .serializers import ViewBoardSerializer, ViewDetailSubBoardSerializer, ViewDetailSubBoardUserSerializer, CreateSubBoardSerializer, UpdateSubBoardSerializer, UpdateUserAccessToSubBoardSerializer
 
 
