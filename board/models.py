@@ -18,7 +18,7 @@ class Category(models.Model):
         return self.name
 
 class Board(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -47,7 +47,7 @@ class SubBoard(models.Model):
         return self.title
 
 class SubBoardUser(models.Model):
-    users = models.ManyToManyField(User, on_delete=models.CASCADE)
+    users = models.ManyToManyField(User)
     sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE)
     join_date = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=20, choices=RoleChoices.choices, default=RoleChoices.USER)
