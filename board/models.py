@@ -1,4 +1,3 @@
-from unicodedata import category
 from django.db import models
 from user.models import User
 from .choices import SubBoardStatusChoices, SubBoardPriorityChoices, RoleChoices
@@ -22,10 +21,10 @@ class SubBoard(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='sub_boards')
     title = models.CharField(max_length=255)
-    inspiration = models.TextField()
-    description = models.TextField()
+    inspiration = models.TextField(null=True)
+    description = models.TextField(null=True)
     is_shared = models.BooleanField(default=False)
-    due_date = models.DateTimeField()
+    due_date = models.DateTimeField(null=True)
     priority = models.CharField(
         max_length=20, 
         choices=SubBoardPriorityChoices.choices, 
@@ -48,9 +47,3 @@ class SubBoardUser(models.Model):
 
     class Meta:
         unique_together = ('user', 'sub_board')
-
-    # def save(self, *args, **kwargs):
-    #     # On save, if this is the first user associated with the sub-board, designate them as admin
-    #     if not self.sub_board.subboarduser_set.exists():
-    #         self.role = RoleChoices.ADMIN
-    #     super().save(*args, **kwargs)

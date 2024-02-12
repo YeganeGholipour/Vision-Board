@@ -91,10 +91,6 @@ class ChangePasswordView(APIView):
 
 
 
-from django.urls import reverse
-from django.core.mail import send_mail
-from django.conf import settings
-
 class ForgetPasswordRequestView(APIView):
     serializer_class = UserForgetPasswordRequestSerializer
     authentication_classes = [TokenAuthentication]

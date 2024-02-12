@@ -7,7 +7,7 @@ from .choices import PriorityChoices, StatusChoices
 class AddAndUpdateGoalToSubBoardSerializer(serializers.ModelSerializer):
     priority = serializers.ChoiceField(choices=PriorityChoices.choices)
     status = serializers.ChoiceField(choices=StatusChoices.choices)
-    category = serializers.StringRelatedField(required=True)
+    category = serializers.StringRelatedField() # remove required=True
     class Meta:
         model = Goal
         field = ('title', 'description', 'due_date', 'priority', 'status', 'category')

@@ -41,6 +41,14 @@ class CreateSubBoardSerializer(serializers.ModelSerializer):
         model = SubBoard
         fields = ('title', 'inspiration', 'description', 'is_shared', 'due_date', 'priority','status')
 
+    def create(self, validated_data):
+        # Get the board instance from the serializer context
+        board = self.context.get('board')
+        # Set the board field of the sub-board
+        validated_data['board'] = board
+        # Create and return the sub-board instance
+        return super().create(validated_data)
+
 
 class AddUsersToSubBoardSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,9 +72,9 @@ class UpdateUserAccessToSubBoardSerializer(serializers.ModelSerializer):
         fields = ('users', 'role')
 
 class SubBoardUserSerializer(serializers.ModelSerializer):
-    users = serializers.PrimaryKeyRelatedField()
-    sub_board = serializers.PrimaryKeyRelatedField()
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all()) #////
+    sub_board = serializers.PrimaryKeyRelatedField(queryset=SubBoard.objects.all()) #/////
     role = serializers.ChoiceField(choices=RoleChoices.choices)
     class Meta:
         model = SubBoardUser
-        fields = ('users', 'role', 'sub_board')
+        fields = ('user', 'role', 'sub_board')

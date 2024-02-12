@@ -10,12 +10,13 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ("board", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name="Board",
+            name="Category",
             fields=[
                 (
                     "id",
@@ -26,19 +27,11 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
-                (
-                    "user",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name="SubBoard",
+            name="Goal",
             fields=[
                 (
                     "id",
@@ -52,9 +45,7 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 ("title", models.CharField(max_length=255)),
-                ("inspiration", models.TextField(null=True)),
                 ("description", models.TextField(null=True)),
-                ("is_shared", models.BooleanField(default=False)),
                 ("due_date", models.DateTimeField(null=True)),
                 (
                     "priority",
@@ -81,17 +72,23 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "board",
+                    "category",
+                    models.ManyToManyField(
+                        related_name="goal_categories", to="goal.category"
+                    ),
+                ),
+                (
+                    "sub_board",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="sub_boards",
-                        to="board.board",
+                        related_name="goals",
+                        to="board.subboard",
                     ),
                 ),
             ],
         ),
         migrations.CreateModel(
-            name="SubBoardUser",
+            name="Task",
             fields=[
                 (
                     "id",
@@ -102,37 +99,42 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("join_date", models.DateTimeField(auto_now_add=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                ("due_date", models.DateTimeField(null=True)),
                 (
-                    "role",
+                    "priority",
                     models.CharField(
                         choices=[
-                            ("admin", "Admin"),
-                            ("viewer", "Viewer"),
-                            ("user", "User"),
+                            ("low", "Low"),
+                            ("medium", "Medium"),
+                            ("high", "High"),
                         ],
-                        default="user",
+                        default="medium",
                         max_length=20,
                     ),
                 ),
                 (
-                    "sub_board",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="sub_board",
-                        to="board.subboard",
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("in progress", "In Progress"),
+                            ("completed", "Completed"),
+                        ],
+                        default="pending",
+                        max_length=20,
                     ),
                 ),
+                ("assigned_to", models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
                 (
-                    "user",
+                    "goal",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to=settings.AUTH_USER_MODEL,
+                        on_delete=django.db.models.deletion.CASCADE, to="goal.goal"
                     ),
                 ),
             ],
-            options={
-                "unique_together": {("user", "sub_board")},
-            },
         ),
     ]

@@ -15,9 +15,9 @@ class Goal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(null=True)
     sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE, related_name='goals')  
-    due_date = models.DateTimeField()
+    due_date = models.DateTimeField(null=True)
     category = models.ManyToManyField(Category, related_name="goal_categories")
     priority = models.CharField(
         max_length=20, 
@@ -39,7 +39,7 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE)
-    due_date = models.DateTimeField()
+    due_date = models.DateTimeField(null=True)
     priority = models.CharField(
         max_length=20, 
         choices=PriorityChoices.choices, 

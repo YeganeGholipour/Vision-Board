@@ -6,7 +6,7 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, UpdateMod
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from .permissions import IsAdmin, IsViewer, IsUser, HasUserAcessToSubBoard, IsAdminOrIsUser
-from .models import Board, SubBoardUser
+from .models import Board, SubBoard, SubBoardUser
 from .serializers import (
     ViewBoardSerializer, ViewDetailSubBoardSerializer, 
     ViewDetailSubBoardUserSerializer, CreateSubBoardSerializer, 
@@ -32,14 +32,29 @@ class ViewDetailSubBoard(RetrieveAPIView):
     # the user needs to be in the list of users who have access to the board -> HasUserAcessToSubBoard Permission
     serializer_class = ViewDetailSubBoardSerializer
     permission_classes = [IsAuthenticated, HasUserAcessToSubBoard]
+    # permission_classes = [IsAuthenticated]
     authentication_classes = [SessionAuthentication, TokenAuthentication]
 
-class ViewDetailSubBoardUser(RetrieveAPIView):
-    # views a single sub board that the user who has sent the request for
-    # it also shows the name of the users who have access to this sub board
-    serializer_class = ViewDetailSubBoardUserSerializer
-    permission_classes = [IsAuthenticated, HasUserAcessToSubBoard]
+    def get_queryset(self):
+        # Retrieve the pk from the URL kwargs
+        pk = self.kwargs.get('pk')
+        # Filter the queryset to get the SubBoard with the specified pk
+        queryset = SubBoard.objects.filter(pk=pk)
+        return queryset
+    
+
+class SubBoardUserDetailView(RetrieveAPIView):
+    serializer_class = SubBoardUserSerializer
+    permission_classes = [IsAuthenticated]
     authentication_classes = [SessionAuthentication, TokenAuthentication]
+    queryset = SubBoardUser.objects.all()  # Start with all SubBoardUser instances
+
+    def get(self, request, *args, **kwargs):
+        sub_board_id = kwargs.get('pk')  # Get the sub_board_id from URL params
+        sub_board_users = SubBoardUser.objects.filter(sub_board_id=sub_board_id)  # Filter SubBoardUser instances based on sub_board_id
+        serializer = self.get_serializer(sub_board_users, many=True)
+        return Response(serializer.data)
+
 
 class CreateSubBoard(GenericAPIView, CreateModelMixin):
     serializer_class = CreateSubBoardSerializer
@@ -47,7 +62,12 @@ class CreateSubBoard(GenericAPIView, CreateModelMixin):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+
+        # Get the current user's board
+        user = request.user
+        board = Board.objects.get(user=user)
+
+        serializer = self.get_serializer(data=request.data, context={'board': board})
         serializer.is_valid(raise_exception=True)
 
         # creates the sub board instance
@@ -63,6 +83,7 @@ class CreateSubBoard(GenericAPIView, CreateModelMixin):
         sub_board_user_serializer = SubBoardUserSerializer(data=sub_board_user_data)
         sub_board_user_serializer.is_valid(raise_exception=True)
 
+        # creates the sub board user instance
         sub_board_user_inst = sub_board_user_serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -81,6 +102,7 @@ class UpdateSubBoard(GenericAPIView,UpdateModelMixin):
     serializer_class = UpdateSubBoardSerializer 
     permission_classes = [IsAuthenticated, IsAdminOrIsUser]
     authentication_classes = [SessionAuthentication, TokenAuthentication]
+
 
     def put(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
