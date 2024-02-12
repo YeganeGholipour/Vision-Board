@@ -87,8 +87,8 @@ class UserForgetPasswordRequestSerializer(serializers.Serializer):
 
 
 class UserPasswordResetConfirmSerializer(serializers.Serializer):
-    uidb64 = serializers.CharField()
-    token = serializers.CharField()
+    # uidb64 = serializers.CharField()
+    # token = serializers.CharField()
     password = serializers.CharField() 
 
     def validate_uidb64(self, value):

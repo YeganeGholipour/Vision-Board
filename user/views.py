@@ -3,6 +3,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import base64
+
 from rest_framework import permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -108,7 +110,9 @@ class ForgetPasswordRequestView(APIView):
         token = token_generator.make_token(user)
 
         # Build the reset URL
-        reset_link = reverse('password_reset_confirm', args=[user.pk, token])
+        user_id = user.pk  
+        uidb64 = base64.urlsafe_b64encode(str(user_id).encode()).decode()
+        reset_link = reverse('user:password_reset_confirm', args=[uidb64, token])
         reset_url = request.build_absolute_uri(reset_link)
 
         # Send the password reset email to the user
@@ -125,17 +129,17 @@ class PasswordResetConfirmView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, uidb64, token, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        uidb64 = serializer.validated_data['uidb64']
-        token = serializer.validated_data['token']
         password = serializer.validated_data['password']
 
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
+
+            
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return Response({'detail': 'Invalid user ID.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -145,5 +149,3 @@ class PasswordResetConfirmView(APIView):
             return Response({'detail': 'Password reset successful.'}, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
-
-
