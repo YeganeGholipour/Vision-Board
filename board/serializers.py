@@ -57,8 +57,16 @@ class UpdateSubBoardSerializer(serializers.ModelSerializer):
 
 
 class UpdateUserAccessToSubBoardSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()  
+    users = serializers.StringRelatedField()  
     role = serializers.ChoiceField(choices=RoleChoices.choices)
     class Meta:
         model = SubBoardUser
         fields = ('users', 'role')
+
+class SubBoardUserSerializer(serializers.ModelSerializer):
+    users = serializers.PrimaryKeyRelatedField()
+    sub_board = serializers.PrimaryKeyRelatedField()
+    role = serializers.ChoiceField(choices=RoleChoices.choices)
+    class Meta:
+        model = SubBoardUser
+        fields = ('users', 'role', 'sub_board')

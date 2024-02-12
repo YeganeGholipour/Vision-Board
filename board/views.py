@@ -6,8 +6,13 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, UpdateMod
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from .permissions import IsAdmin, IsViewer, IsUser, HasUserAcessToSubBoard, IsAdminOrIsUser
-from .models import Board
-from .serializers import ViewBoardSerializer, ViewDetailSubBoardSerializer, ViewDetailSubBoardUserSerializer, CreateSubBoardSerializer, UpdateSubBoardSerializer, UpdateUserAccessToSubBoardSerializer
+from .models import Board, SubBoardUser
+from .serializers import (
+    ViewBoardSerializer, ViewDetailSubBoardSerializer, 
+    ViewDetailSubBoardUserSerializer, CreateSubBoardSerializer, 
+    UpdateSubBoardSerializer, UpdateUserAccessToSubBoardSerializer,
+    SubBoardUserSerializer,
+    )
 
 
 
@@ -40,6 +45,26 @@ class CreateSubBoard(GenericAPIView, CreateModelMixin):
     serializer_class = CreateSubBoardSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [SessionAuthentication, TokenAuthentication]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # creates the sub board instance
+        sub_board_inst = serializer.save()
+
+        # sub board user instance
+        sub_board_user_data = {
+            "sub_board": sub_board_inst.pk,
+            "user": request.user.pk,
+            "role": "admin",
+        }
+        
+        sub_board_user_serializer = SubBoardUserSerializer(data=sub_board_user_data)
+        sub_board_user_serializer.is_valid(raise_exception=True)
+
+        sub_board_user_inst = sub_board_user_serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)

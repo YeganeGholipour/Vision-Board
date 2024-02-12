@@ -11,12 +11,6 @@ from .choices import SubBoardStatusChoices, SubBoardPriorityChoices, RoleChoices
 # Category
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
 class Board(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -47,52 +41,16 @@ class SubBoard(models.Model):
         return self.title
 
 class SubBoardUser(models.Model):
-    users = models.ManyToManyField(User)
-    sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE, related_name='sub_board')
     join_date = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=20, choices=RoleChoices.choices, default=RoleChoices.USER)
 
+    class Meta:
+        unique_together = ('user', 'sub_board')
 
-class Goal(models.Model):  
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    sub_board = models.ForeignKey(SubBoard, on_delete=models.CASCADE, related_name='goals')  
-    due_date = models.DateTimeField()
-    category = models.ManyToManyField(Category, related_name="goal_categories")
-    priority = models.CharField(
-        max_length=20, 
-        choices=SubBoardPriorityChoices.choices, 
-        default=SubBoardPriorityChoices.MEDIUM,
-    )
-    status = models.CharField(
-        max_length=20,
-        choices=SubBoardStatusChoices.choices,
-        default=SubBoardStatusChoices.PENDING,
-    )
-
-    def __str__(self):
-        return self.title 
-
-class Task(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    goal = models.ForeignKey(Goal, on_delete=models.CASCADE)
-    due_date = models.DateTimeField()
-    priority = models.CharField(
-        max_length=20, 
-        choices=SubBoardPriorityChoices.choices, 
-        default=SubBoardPriorityChoices.MEDIUM,
-    )
-    status = models.CharField(
-        max_length=20,
-        choices=SubBoardStatusChoices.choices,
-        default=SubBoardStatusChoices.PENDING,
-    )
-    assigned_to = models.ManyToManyField(User)  
-
-    def __str__(self):
-        return self.title
+    # def save(self, *args, **kwargs):
+    #     # On save, if this is the first user associated with the sub-board, designate them as admin
+    #     if not self.sub_board.subboarduser_set.exists():
+    #         self.role = RoleChoices.ADMIN
+    #     super().save(*args, **kwargs)
