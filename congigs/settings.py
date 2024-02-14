@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
 
+    'celery',
+    # 'kombu.transport.django',
+
     "user", 
     "board",
     'goal',
@@ -144,6 +147,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')    
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')   
+
+
+# broker
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
 
 
 # Static files (CSS, JavaScript, Images)

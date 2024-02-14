@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import base64
+from .tasks import sendingEmailTask
 
 from rest_framework import permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -118,7 +119,7 @@ class ForgetPasswordRequestView(APIView):
         # Send the password reset email to the user
         subject = 'Password Reset Request'
         message = f'Hello,\n\nYou have requested to reset your password. Please click on the following link to reset your password:\n\n{reset_url}\n\nIf you did not request this, please ignore this email.\n\nThank you.\n'
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [email])
+        sendingEmailTask.delay(subject, message, email)
 
         return Response({'message': 'Password reset email has been sent.'}, status=status.HTTP_200_OK)
 
