@@ -5,20 +5,23 @@ This project is a web application that allows users to create and manage vision 
 ## Installation
 
 1. Clone the repository:
+```bash
 git clone https://github.com/YeganeGholipour/Vision-Board.git
+```
 
-
-2. Install dependencies:
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
-
+```
 
 ## Usage
 
 1. Run the development server:
+```bash
 python manage.py runserver
+```
 
-
-2. Access the application at [http://localhost:8000](http://localhost:8000)
+3. Access the application at [http://localhost:8000](http://localhost:8000)
 
 ## File Structure
 vision-board-project/
@@ -47,8 +50,9 @@ vision-board-project/
 
 This project uses Celery for asynchronous task processing. To run Celery worker:
 
+```bash
 celery -A config worker -l info
-
+```
 
 ## RabbitMQ
 
