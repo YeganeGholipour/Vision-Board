@@ -21,7 +21,6 @@ python manage.py runserver
 2. Access the application at [http://localhost:8000](http://localhost:8000)
 
 ## File Structure
-
 vision-board-project/
 ├── board/
 │ ├── models.py
@@ -33,12 +32,34 @@ vision-board-project/
 │ └── ...
 ├── manage.py
 ├── README.md
-└── requirements.txt
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+└── celeryconfig.py
 
 
 ## Configuration
 
 - Edit `config/settings.py` to configure the project settings.
+- Configure Celery tasks in `celeryconfig.py`.
+
+## Celery
+
+This project uses Celery for asynchronous task processing. To run Celery worker:
+
+celery -A config worker -l info
+
+
+## RabbitMQ
+
+This project uses RabbitMQ as the message broker for Celery. Make sure RabbitMQ is installed and running. Update the Celery configuration in `celeryconfig.py` to point to the RabbitMQ server.
+
+## Docker
+
+This project includes Docker support. To build and run the Docker container:
+
+
+
 
 ## Contributing
 
@@ -51,6 +72,6 @@ This project is licensed under the [MIT License](LICENSE).
 ## Credits
 
 - Django REST Framework
-- Bootstrap
 - Font Awesome
-
+- Celery
+- Docker
