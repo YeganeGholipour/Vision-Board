@@ -24,22 +24,26 @@ python manage.py runserver
 3. Access the application at [http://localhost:8000](http://localhost:8000)
 
 ## File Structure
+```
 vision-board-project/
+│
 ├── board/
-│ ├── models.py
-│ ├── views.py
-│ └── ...
+│   ├── models.py
+│   ├── views.py
+│   └── ...
+│
 ├── config/
-│ ├── settings.py
-│ ├── urls.py
-│ └── ...
+│   ├── settings.py
+│   ├── urls.py
+│   └── ...
+│
 ├── manage.py
 ├── README.md
 ├── requirements.txt
 ├── Dockerfile
 ├── docker-compose.yml
 └── celeryconfig.py
-
+```
 
 ## Configuration
 
