@@ -67,7 +67,25 @@ This project uses RabbitMQ as the message broker for Celery. Make sure RabbitMQ 
 This project includes Docker support. To build and run the Docker container:
 
 
+## Swagger Documentation
 
+This project includes Swagger documentation to help you understand and interact with the API endpoints. You can access the Swagger UI by following these steps:
+
+1. Start the Django development server:
+
+   ```bash
+   python manage.py runserver
+   ```
+2. Open your web browser and navigate to the Swagger UI endpoint:
+
+   ```bash
+   http://localhost:8000/docs/
+   ```
+   
+Explore the API endpoints:
+
+Use the Swagger UI interface to view and interact with the available API endpoints.
+Each endpoint includes detailed information on parameters, request bodies, and responses.
 
 ## Contributing
 
